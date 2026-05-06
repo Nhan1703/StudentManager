@@ -3,6 +3,8 @@ package com.example.studentmanager.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import com.example.studentmanager.service.StudentService;
 @RequestMapping("/students")
 public class StudentController {
 
+    private static final int PAGE_SIZE = 10;
+
     private final StudentService studentService;
 
     public StudentController(StudentService studentService) {
@@ -22,8 +26,8 @@ public class StudentController {
 
     // 1. Hiển thị tất cả sinh viên + form thêm
     @GetMapping
-    public String listStudents(Model model) {
-        model.addAttribute("students", studentService.getAllStudents());
+    public String listStudents(@RequestParam(defaultValue = "0") int page, Model model) {
+        addStudentsPage(model, page);
         model.addAttribute("student", new Student());
         return "students";
     }
@@ -41,7 +45,7 @@ public class StudentController {
         Student student = studentService.getById(id);
 
         model.addAttribute("student", student);
-        model.addAttribute("students", studentService.getAllStudents());
+        addStudentsPage(model, 0);
 
         return "students";
     }
@@ -80,5 +84,20 @@ public class StudentController {
         model.addAttribute("keyword", keyword);
 
         return "students";
+    }
+
+    private void addStudentsPage(Model model, int page) {
+        int currentPage = Math.max(page, 0);
+        Page<Student> studentPage = studentService.getStudentsPage(PageRequest.of(currentPage, PAGE_SIZE));
+
+        if (studentPage.getTotalPages() > 0 && currentPage >= studentPage.getTotalPages()) {
+            currentPage = studentPage.getTotalPages() - 1;
+            studentPage = studentService.getStudentsPage(PageRequest.of(currentPage, PAGE_SIZE));
+        }
+
+        model.addAttribute("students", studentPage.getContent());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", studentPage.getTotalPages());
+        model.addAttribute("totalItems", studentPage.getTotalElements());
     }
 }

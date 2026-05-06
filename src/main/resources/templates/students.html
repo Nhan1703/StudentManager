@@ -108,16 +108,44 @@
 
             <form th:action="@{/students/delete/{id}(id=${sv.id})}"
                 method="get"
-                style="display:inline">
+                style="display:inline; margin:0; vertical-align:middle">
                 <button type="submit"
                         class="btn btn-danger btn-sm"
                         onclick="return confirm('Bạn có chắc muốn xóa?')">
+                    X&oacute;a
                 </button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
+
+<nav th:if="${totalPages != null and totalPages > 1}" aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+            <a class="page-link"
+                th:href="@{/students(page=${currentPage - 1})}">
+                Truoc
+            </a>
+        </li>
+
+        <li class="page-item"
+            th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
+            th:classappend="${pageNumber == currentPage} ? 'active' : ''">
+            <a class="page-link"
+                th:href="@{/students(page=${pageNumber})}"
+                th:text="${pageNumber + 1}">
+            </a>
+        </li>
+
+        <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+            <a class="page-link"
+                th:href="@{/students(page=${currentPage + 1})}">
+                Sau
+            </a>
+        </li>
+    </ul>
+</nav>
 
 </body>
 </html>

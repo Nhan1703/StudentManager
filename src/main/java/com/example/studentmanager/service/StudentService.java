@@ -2,6 +2,8 @@ package com.example.studentmanager.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.studentmanager.entity.Student;
@@ -20,6 +22,10 @@ public class StudentService {
         return repository.findAll();
     }
 
+    public Page<Student> getStudentsPage(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
     public Student save(Student student) {
         return repository.save(student);
     }
@@ -32,7 +38,7 @@ public class StudentService {
         repository.deleteById(id);
     }
 
-    // ✅ THÊM CHO TÌM KIẾM THEO TÊN
+    // TÌM KIẾM THEO TÊN
     public List<Student> findByName(String name) {
         return repository.findByNameContainingIgnoreCase(name);
     }
